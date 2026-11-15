@@ -1,2 +1,35 @@
-.env
+# personal docs
 /docs
+
+# Environment & Secrets 
+.env
+.env.*
+*.env
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+
+# Local Database & Storage
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db_snapshots/
+*.sqlite*
+
+# Run Artifacts & Snapshots
+runs/
+snapshots/
+*.html
+
+# Logs & Temporary Files
+*.log
+logs/
+tmp/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+.pytest_cache/

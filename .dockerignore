@@ -1,0 +1,35 @@
+# Git and environment
+.git/
+.gitignore
+.env
+.env.*
+.venv/
+env/
+venv/
+
+# Local databases and snapshots
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db_snapshots/
+
+# Tests and documentation
+tests/
+docs/
+*.md
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local IDE and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+

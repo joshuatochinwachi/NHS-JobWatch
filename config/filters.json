@@ -1,0 +1,131 @@
+{
+  "version": "1.1",
+  "rules_status": "CONFIRMED BY OWNER",
+  "closing_soon_days": 5,
+  "default_outcome": "excluded",
+  "exclusions": [
+    {
+      "id": "exclude_dental",
+      "target": "title",
+      "patterns": ["\\bdental\\b", "\\bdental nurse\\b"],
+      "reason": "Dental nursing role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_theatre_odp",
+      "target": "title",
+      "patterns": ["\\banaesthetic practitioner\\b", "\\bodp\\b", "\\boperating department practitioner\\b"],
+      "reason": "Theatre / Anaesthetic practitioner / ODP role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_school_nursery",
+      "target": "title",
+      "patterns": ["\\bschool nurse\\b", "\\bnursery\\b", "\\bnursery nurse\\b"],
+      "reason": "School or nursery nursing role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_paediatric_children",
+      "target": "title",
+      "patterns": ["\\bpaediatric\\b", "\\bchildren\\b", "\\bneonatal\\b"],
+      "reason": "Paediatric or neonatal nursing role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_learning_disability",
+      "target": "title",
+      "patterns": ["\\blearning disabilit(y|ies)\\b", "\\brnld\\b"],
+      "reason": "Learning disability nursing role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_public_health_midwife",
+      "target": "title",
+      "patterns": ["\\bhealth visitor\\b", "\\bmidwife\\b", "\\bmidwifery\\b"],
+      "reason": "Health visitor or midwifery role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_anp_acp",
+      "target": "title",
+      "patterns": ["\\banp\\b", "\\bacp\\b", "\\badvanced nurse practitioner\\b", "\\badvanced clinical practitioner\\b"],
+      "reason": "Advanced practice (ANP/ACP) role excluded per Adult RN scope"
+    },
+    {
+      "id": "exclude_management_high_seniority",
+      "target": "title",
+      "patterns": ["\\bchief\\b", "\\blead\\b", "\\bmanager\\b", "\\bteam leader\\b", "\\bclinical lead\\b", "\\bhead of\\b", "\\bdirector\\b"],
+      "reason": "Management or leadership role excluded"
+    },
+    {
+      "id": "exclude_non_standard_posts",
+      "target": "title",
+      "patterns": ["\\binternal transfer\\b", "\\bretire and return\\b", "\\bretire & return\\b"],
+      "reason": "Internal transfer or retire and return post excluded"
+    },
+    {
+      "id": "exclude_nurse_mental_health",
+      "target": "title",
+      "requires_role": "nurse",
+      "patterns": ["\\bmental health\\b", "\\brmn\\b", "\\bpsychiatric\\b"],
+      "reason": "Mental health nursing role excluded (role-aware: does not exclude support worker)"
+    },
+    {
+      "id": "exclude_nurse_low_band",
+      "role": "nurse",
+      "max_band_exclusive": 5,
+      "reason": "Nursing role below minimum Band 5 excluded"
+    },
+    {
+      "id": "exclude_nurse_high_band",
+      "role": "nurse",
+      "min_band_inclusive": 7,
+      "reason": "Nursing role at Band 7 or above excluded by default"
+    },
+    {
+      "id": "exclude_support_low_band",
+      "role": "support",
+      "max_band_exclusive": 3,
+      "reason": "Support role below minimum Band 3 (e.g. Band 2) excluded"
+    }
+  ],
+  "strong_rules": [
+    {
+      "id": "strong_staff_nurse",
+      "role": "nurse",
+      "target": "title",
+      "patterns": ["\\bstaff nurse\\b", "\\bregistered nurse\\b"],
+      "allowed_bands": ["Band 5", "Band 6", "Band unknown"],
+      "reason": "Core registered/staff nurse post at Band 5 or 6"
+    }
+  ],
+  "maybe_rules": [
+    {
+      "id": "maybe_senior_nurse_band6",
+      "role": "nurse",
+      "target": "title",
+      "patterns": ["\\bsenior staff nurse\\b", "\\bcharge nurse\\b"],
+      "allowed_bands": ["Band 6", "Band unknown"],
+      "reason": "Senior staff nurse or charge nurse at Band 6"
+    },
+    {
+      "id": "maybe_general_nurse",
+      "role": "nurse",
+      "target": "title",
+      "patterns": ["\\bnurse\\b"],
+      "allowed_bands": ["Band 5", "Band 6", "Band unknown"],
+      "reason": "Other nursing role at Band 5 or 6 (or band unknown)"
+    },
+    {
+      "id": "maybe_support_worker",
+      "role": "support",
+      "target": "title",
+      "patterns": [
+        "\\bhealthcare support worker\\b",
+        "\\bhealth care assistant\\b",
+        "\\bcare assistant\\b",
+        "\\bsenior support worker\\b",
+        "\\bhcsw\\b",
+        "\\bclinical support worker\\b"
+      ],
+      "allowed_bands": ["Band 3", "Band 4", "Band 5", "Band unknown"],
+      "reason": "Healthcare support worker / assistant role at Band 3 or above"
+    }
+  ]
+}
+
