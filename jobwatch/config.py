@@ -28,11 +28,11 @@ MONITORED_SCOPES = [
 
 SCOPE_REQUEST_CAPS = {
     "Departments=9": 30,
-    "Departments=11": 6,
-    "what=nurse": 8,
-    "what=healthcare support worker": 6,
-    "what=health care assistant": 6,
-    "what=care assistant": 6,
+    "Departments=11": 8,
+    "what=nurse": 30,
+    "what=healthcare support worker": 10,
+    "what=health care assistant": 10,
+    "what=care assistant": 10,
 }
 
 

@@ -932,7 +932,7 @@ async def cmd_baseline(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         )
         return
 
-    scope_key = args[0].strip()
+    scope_key = " ".join(args).strip()
     if scope_key not in MONITORED_SCOPES:
         await update.message.reply_text(
             f"❌ Unknown scope <code>{html.escape(scope_key)}</code>. Must be one of:\n" +
