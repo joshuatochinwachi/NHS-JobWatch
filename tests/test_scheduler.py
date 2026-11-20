@@ -511,6 +511,63 @@ class TestSchedulerAndStep5(unittest.IsolatedAsyncioTestCase):
                 chk_s.close()
                 self.assertTrue(meta["is_baselined"])
 
+    # 16. New Vacancy Alert Dispatching
+    async def test_dispatch_new_vacancy_alerts_formatting_and_delivery(self):
+        """Verifies dispatch_new_vacancy_alerts formats without TypeError and delivers via bot."""
+        jid = 888777
+        new_vac = {
+            "job_id": jid,
+            "title_raw": "Staff Nurse - Band 5",
+            "title": "Staff Nurse - Band 5",
+            "detail_url": f"https://apply.jobs.scot.nhs.uk/Job/JobDetail?JobId={jid}",
+            "closing_date_raw": "30/06/2027",
+            "closing_date": "2027-06-30",
+            "salary_raw": "Band 5 (£30,000 - £35,000)",
+            "salary": "Band 5 (£30,000 - £35,000)",
+            "band": "Band 5",
+            "employer_raw": "NHS Greater Glasgow and Clyde",
+            "employer": "NHS Greater Glasgow and Clyde",
+            "location_raw": "Glasgow",
+            "location": "Glasgow",
+            "dept_label_raw": "Nursing",
+            "dept_label": "Nursing",
+            "contract_raw": "Permanent",
+            "contract": "Permanent",
+            "hours_raw": "37.5 hours per week",
+        }
+        # Insert vacancy into DB first
+        self.storage.conn.execute(
+            """INSERT INTO vacancies (job_id, detail_url, title_raw, title, closing_date_raw, closing_date,
+               salary_raw, salary, band, employer, location, dept_label, contract, hours_raw,
+               first_seen_at, last_seen_at, is_listed, content_hash)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '2026-11-20', '2026-11-20', 1, 'h888');""",
+            (jid, new_vac["detail_url"], new_vac["title_raw"], new_vac["title"], new_vac["closing_date_raw"],
+             new_vac["closing_date"], new_vac["salary_raw"], new_vac["salary"], new_vac["band"],
+             new_vac["employer"], new_vac["location"], new_vac["dept_label"], new_vac["contract"],
+             new_vac["hours_raw"]),
+        )
+        self.storage.set_user_status(jid, "new", None, "2026-11-20T00:00:00Z", user_id="shared")
+
+        scheduler = AsyncScheduler(
+            storage=self.storage,
+            bot=self.bot,
+            allowed_chat_ids=[12345],
+            admin_chat_id=12345,
+            clock=lambda: datetime(2026, 11, 20, 12, 0, tzinfo=LONDON_TZ),
+        )
+
+        sent = await scheduler.dispatch_new_vacancy_alerts([new_vac])
+        self.assertEqual(sent, 1)
+        self.assertEqual(len(self.bot.sent_messages), 1)
+        msg_text = self.bot.sent_messages[0]["text"]
+        self.assertIn("STRONG MATCH", msg_text)
+        self.assertIn("Staff Nurse", msg_text)
+        self.assertIn("NHS Greater Glasgow and Clyde", msg_text)
+
+        # Confirm marked as alerted in storage
+        unalerted = self.storage.get_unalerted_vacancies()
+        self.assertEqual(len(unalerted), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

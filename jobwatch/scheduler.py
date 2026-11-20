@@ -138,7 +138,11 @@ class AsyncScheduler:
                 title=vac.get("title", ""),
                 detail_url=vac.get("detail_url", f"https://apply.jobs.scot.nhs.uk/Job/JobDetail?JobId={jid}"),
                 closing_date_raw=vac.get("closing_date_raw", ""),
-                closing_date=datetime.fromisoformat(vac["closing_date"]) if vac.get("closing_date") else None,
+                closing_date=(
+                    datetime.fromisoformat(vac["closing_date"]).date()
+                    if vac.get("closing_date")
+                    else None
+                ),
                 salary_raw=vac.get("salary_raw"),
                 salary=vac.get("salary"),
                 band=vac.get("band"),
@@ -162,7 +166,12 @@ class AsyncScheduler:
                 self.storage.mark_alerted(jid, now_iso, user_id="shared")
                 continue
 
-            alert_text = format_new_vacancy_alert(card, outcome=dec.outcome, matched_rule=dec.matched_rule)
+            alert_text = format_new_vacancy_alert(
+                card=card,
+                outcome=dec.outcome,
+                match_reason=dec.match_reason or dec.matched_rule or "",
+                closing_soon_days=config.closing_soon_days,
+            )
             kb = alert_keyboard(jid, card.detail_url)
 
             for cid in self.allowed_chat_ids:

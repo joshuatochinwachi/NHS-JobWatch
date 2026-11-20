@@ -31,10 +31,12 @@ def parse_full_time(hours_raw: Optional[str]) -> bool:
         return False
 
 
-def is_closing_soon(closing_date: Optional[date], closing_soon_days: int = 5) -> bool:
+def is_closing_soon(closing_date: Optional[Any], closing_soon_days: int = 5) -> bool:
     """Returns True if closing_date is within closing_soon_days of today in London."""
     if not closing_date:
         return False
+    if isinstance(closing_date, datetime):
+        closing_date = closing_date.date()
     today = get_london_today()
     delta = (closing_date - today).days
     return 0 <= delta <= closing_soon_days
@@ -43,8 +45,9 @@ def is_closing_soon(closing_date: Optional[date], closing_soon_days: int = 5) ->
 def format_new_vacancy_alert(
     card: VacancyCard,
     outcome: str,
-    match_reason: str,
+    match_reason: str = "",
     closing_soon_days: int = 5,
+    matched_rule: Optional[str] = None,
 ) -> str:
     """Formats a single new vacancy into a rich Telegram HTML message."""
     tier_badge = "⭐ <b>[STRONG MATCH]</b>" if outcome == "strong" else "📌 <b>[POTENTIAL MATCH]</b>"
@@ -74,6 +77,7 @@ def format_new_vacancy_alert(
     flags_line = f"\n{' | '.join(flags)}\n" if flags else ""
 
     closing_str = card.closing_date.strftime("%d/%m/%Y") if card.closing_date else (card.closing_date_raw or "Unknown")
+    rule_display = match_reason or matched_rule or ""
 
     return (
         f"{tier_badge}\n"
@@ -88,7 +92,7 @@ def format_new_vacancy_alert(
         f"📅 <b>Closing Date:</b> {closing_str}\n"
         f"🔖 <b>Job Ref:</b> {job_ref_esc}\n\n"
         f"🔗 <a href=\"{detail_url}\">View on NHS Scotland</a>\n"
-        f"ℹ️ <i>Rule: {html.escape(match_reason)}</i>"
+        f"ℹ️ <i>Rule: {html.escape(rule_display)}</i>"
     )
 
 
