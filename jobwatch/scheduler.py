@@ -125,7 +125,8 @@ class AsyncScheduler:
 
         sent_count = 0
 
-        for vac in new_vacancies:
+        for raw_vac in new_vacancies:
+            vac = dict(raw_vac)
             jid = vac["job_id"]
             # Evaluate against current filter config
             from jobwatch.models import VacancyCard
@@ -158,6 +159,7 @@ class AsyncScheduler:
 
             # Only strong and maybe matches trigger notifications
             if dec.outcome not in ("strong", "maybe"):
+                self.storage.mark_alerted(jid, now_iso, user_id="shared")
                 continue
 
             alert_text = format_new_vacancy_alert(card, outcome=dec.outcome, matched_rule=dec.matched_rule)

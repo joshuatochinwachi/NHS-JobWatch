@@ -209,6 +209,39 @@ class TestStorageLayer(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
+    def test_get_unalerted_vacancies(self):
+        """Storage.get_unalerted_vacancies returns only unalerted listed vacancies."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        # Vacancy 1: new and unalerted -> should be returned
+        self.storage.conn.execute(
+            """INSERT INTO vacancies (job_id, title_raw, title, detail_url, closing_date_raw, closing_date,
+               first_seen_at, last_seen_at, is_listed, content_hash)
+               VALUES (1, 'V1', 'V1', 'http://1', '2026-12-01', '2026-12-01', ?, ?, 1, 'h1');""",
+            (now_iso, now_iso),
+        )
+        self.storage.set_user_status(1, "new", None, now_iso, user_id="shared")
+
+        # Vacancy 2: already alerted -> should NOT be returned
+        self.storage.conn.execute(
+            """INSERT INTO vacancies (job_id, title_raw, title, detail_url, closing_date_raw, closing_date,
+               first_seen_at, last_seen_at, is_listed, content_hash)
+               VALUES (2, 'V2', 'V2', 'http://2', '2026-12-01', '2026-12-01', ?, ?, 1, 'h2');""",
+            (now_iso, now_iso),
+        )
+        self.storage.set_user_status(2, "new", now_iso, now_iso, user_id="shared")
+
+        # Vacancy 3: unlisted -> should NOT be returned
+        self.storage.conn.execute(
+            """INSERT INTO vacancies (job_id, title_raw, title, detail_url, closing_date_raw, closing_date,
+               first_seen_at, last_seen_at, is_listed, content_hash)
+               VALUES (3, 'V3', 'V3', 'http://3', '2026-12-01', '2026-12-01', ?, ?, 0, 'h3');""",
+            (now_iso, now_iso),
+        )
+
+        unalerted = self.storage.get_unalerted_vacancies(user_id="shared")
+        self.assertEqual(len(unalerted), 1)
+        self.assertEqual(unalerted[0]["job_id"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

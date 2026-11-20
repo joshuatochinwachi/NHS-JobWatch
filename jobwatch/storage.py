@@ -829,6 +829,22 @@ class Storage:
         )
         return cur.fetchall()
 
+    def get_unalerted_vacancies(self, user_id: str = "shared") -> List[sqlite3.Row]:
+        """Retrieves all currently listed vacancies that have not yet had alerts dispatched."""
+        cur = self.conn.execute(
+            """
+            SELECT v.*
+            FROM vacancies v
+            LEFT JOIN user_vacancy_status uvs ON v.job_id = uvs.job_id AND uvs.user_id = ?
+            WHERE v.is_listed = 1
+              AND (uvs.alerted_at IS NULL OR uvs.alerted_at = '')
+              AND (uvs.status IS NULL OR uvs.status = 'new')
+            ORDER BY v.first_seen_at ASC, v.job_id ASC;
+            """,
+            (user_id,),
+        )
+        return cur.fetchall()
+
     def mark_alerted(self, job_id: int, alerted_at: str, user_id: str = "shared") -> None:
         """Updates user_vacancy_status.alerted_at after confirmed delivery."""
         with self.conn:
